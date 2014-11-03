@@ -111,9 +111,18 @@ module OmniAuth
       protected
 
       def build_access_token
-        super.tap do |token|
-          token.options.merge!(access_token_options)
-        end
+        # super.tap do |token|
+        #   token.options.merge!(access_token_options)
+        # end
+
+        # Fix added so that mobile clients can use this gem by providing access_token
+        # instead of passing signed_request and setting cookies.
+
+        access_token = request.params["access_token"]
+        ::OAuth2::AccessToken.from_hash(
+          client,
+          {"access_token" => access_token}.update(access_token_options)
+        )
       end
 
       private
@@ -133,6 +142,10 @@ module OmniAuth
       def with_authorization_code!
         if request.params.key?('code')
           yield
+        elsif access_token = request.params["access_token"]
+          begin
+            yield
+          end
         elsif code_from_signed_request = signed_request_from_cookie && signed_request_from_cookie['code']
           request.params['code'] = code_from_signed_request
           @authorization_code_from_signed_request_in_cookie = true
