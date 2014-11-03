@@ -7,4 +7,4 @@ pkg/*
 tmp
 bin
 example/app.log
-./idea
+.idea/
