@@ -142,13 +142,11 @@ module OmniAuth
       def with_authorization_code!
         if request.params.key?('code')
           yield
-        elsif access_token = request.params["access_token"]
-          binding.pry
+        elsif request.params["access_token"]
           begin
             yield
           end
         elsif code_from_signed_request = signed_request_from_cookie && signed_request_from_cookie['code']
-          binding.pry
           request.params['code'] = code_from_signed_request
           @authorization_code_from_signed_request_in_cookie = true
           # NOTE The code from the signed fbsr_XXX cookie is set by the FB JS SDK will confirm that the identity of the
